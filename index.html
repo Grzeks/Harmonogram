@@ -2,32 +2,39 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Harmonogram</title>
+  <title>Zebrania czwartkowe - Moje Zadania</title>
+  <!-- Ładujemy bibliotekę Google Charts -->
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script>
+  <script type="text/javascript">
+    // Ładujemy paczkę z wizualizacją tabeli
     google.charts.load('current', {'packages':['table']});
     google.charts.setOnLoadCallback(drawTable);
 
     function drawTable() {
-      var queryString = encodeURIComponent('SELECT C, D, E, F, G, H'); // kolumny C–H
-      var query = new google.visualization.Query(
-        'https://docs.google.com/spreadsheets/d/1QH3NWatRNV0xqwcMCv6zSZUDrHN7kOdsKhZ5W-V1A5w/gviz/tq?sheet=Arkusz1&tq=' + queryString
-      );
-
-      query.send(function(response) {
-        var data = response.getDataTable();
-        var table = new google.visualization.Table(document.getElementById('table_div'));
-        table.draw(data, {
-          showRowNumber: true,
-          width: '100%',
-          height: 'auto'
-        });
-      });
+      // Używamy zapytania "select *", żeby pobrać wszystkie kolumny
+      var queryString = encodeURIComponent('select *');
+      // Modyfikujemy URL: tu znajduje się identyfikator opublikowanego arkusza oraz gid odpowiadający zakładce "zebrania czwartkowe"
+      var queryURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRyhnnxhWiZiVHNxiIYBCBVk5ErYOsbzWL8YC_P0T0UUysFqCHmHc-pphWh-i9rsop6M162wwTbj4ox/gviz/tq?gid=476937465&tq=' + queryString;
+      
+      var query = new google.visualization.Query(queryURL);
+      query.send(handleQueryResponse);
+    }
+    
+    function handleQueryResponse(response) {
+      if (response.isError()) {
+        // W przypadku błędu, wyświetlamy komunikat w elemencie HTML
+        document.getElementById('table_div').innerHTML =
+          'Błąd zapytania: ' + response.getMessage() + ' ' + response.getDetailedMessage();
+        return;
+      }
+      var data = response.getDataTable();
+      var table = new google.visualization.Table(document.getElementById('table_div'));
+      table.draw(data, {showRowNumber: true, width: '100%', height: 'auto'});
     }
   </script>
 </head>
 <body>
-  <h2>Harmonogram</h2>
+  <h2>Zebrania czwartkowe - Moje Zadania</h2>
   <div id="table_div"></div>
 </body>
 </html>
